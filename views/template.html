@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Test in progress</title>
+        <style>
+            .prod {
+                background: #F00;
+            }
+            .preprod {
+                background: #FF0;
+            }
+            .integ {
+                background: #0F0;
+            }
+
+            .prod,
+            .preprod,
+            .integ {
+                position: absolute;
+                top: 12px;
+                right: 55px;
+                width: 10px;
+                height: 10px;
+            }
+
+            .title {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0px;
+                padding: 10px 70px 10px 10px;
+                height: 40px;
+                margin: 0 0 10px 0;
+
+                font-size: 16px;
+                font-family: sans-serif;
+                background: #ddd;
+                color: #222;
+                text-align: right;
+                border-bottom: 1px solid #aaa;
+            }
+        </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+            var testRunnerSession = '<%= testRunnerSession %>';
+            function parseQuerystring() {
+                var tmp = location.href
+                    .split('?')[1]
+                    .split('&');
+                var result = {};
+                tmp.forEach(function(param) {
+                    var paramPair = param.split('=');
+                    result[paramPair[0]] = paramPair[1];
+                });
+                return result;                
+            }
+
+            function stringifyQuerystring(querystringObject) {
+                var result = [];
+                for(var paramName in querystringObject) {
+                    result.push(paramName + '=' + querystringObject[paramName]);
+                }
+                result = result.join('&');
+                return result;
+            }
+
+            var querystring = parseQuerystring();
+            if(querystring.testIndex) {
+                querystring.testIndex = parseInt(querystring.testIndex) + 1;
+            }
+            else {
+                querystring.testIndex = 1;
+            }
+            querystring.testRunnerSession = testRunnerSession;
+
+
+            function report(failures) {
+                document.title = 'Test finished';
+                var img = new Image();
+                img.src = '<%- reporterUrl %>' + '&failures=' + failures + '&tags=<%= tags %>' + '&testLocation=' + encodeURIComponent(location.origin) + '&env=<%= env %>';
+            }
+
+            function nextTest() {
+                if(!querystring.oneShot) {
+                    location.replace(location.origin + location.pathname + '?' + stringifyQuerystring(querystring));
+                }
+            }
+        </script>
+        
+        <div class="title">
+            Tags : <b><%= tags %></b> - environment : <b><%= env %></b>
+        </div>
+        <div class="<%=env%>">
+        </div>
+            
+
+<% pageElements.forEach(function(line) { %>
+        <%- line %>
+<% }); %>
+    </body>
+</html>

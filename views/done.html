@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+
+<title>Tests session over</title>
+
+<style>
+    body {
+        font-family: sans-serif;
+    }
+
+    #restart-link {
+        display: block;
+        padding: 10px;
+        width: 140px;
+        margin-top: 10px;
+
+        background: #5362b9;
+        color: white;
+        text-decoration: none;
+        text-align: center;
+    }
+</style>
+
+<p>Tests finished</p>
+
+<a id="restart-link" href="/tests">Restart</a>
+
+<script type="text/javascript">
+    var querystring = (location.href.split('?')[1]).split('&');
+    var querystringObj = {};
+    querystring.forEach(function(element) {
+        var terms = element.split('=');
+        querystringObj[terms[0]] = terms[1];
+    });
+    delete querystringObj['testIndex'];
+    delete querystringObj['testRunnerSession'];
+    var restartQuerystring = [];
+    for(var querystringParam in querystringObj) {
+        restartQuerystring.push(querystringParam + '=' + querystringObj[querystringParam]);
+    }
+    var restartLink = document.getElementById('restart-link');
+    restartLink.href = location.origin + location.pathname + '?' + restartQuerystring.join('&');
+</script>

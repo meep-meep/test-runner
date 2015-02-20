@@ -1,0 +1,17 @@
+{
+  "name": "test-runner-middleware",
+  "version": "0.0.0",
+  "description": "FTV test runner",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joachim Revol-Tissot",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.2.4",
+    "express": "^4.11.2",
+    "querystring": "^0.2.0",
+    "rsvp": "^3.0.16"
+  }
+}
