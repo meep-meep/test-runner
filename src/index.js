@@ -16,7 +16,7 @@ var testSuiteRequest = '/tests';
 
 var app = express();
 
-app.set('views', __dirname + '/views')
+app.set('views', path.join(__dirname, '../templates'));
 app.engine('html', ejs.renderFile);
 
 
@@ -196,7 +196,7 @@ app.get(
         if(qs.testIndex >= testSuites.length) {
             renderResponse(
                     response,
-                    'done.html',
+                    '../templates/done.html',
                     qs
                 )
                 .then(function(renderedView) {
@@ -212,7 +212,7 @@ app.get(
             .then(function(pageElements) {
                 return renderResponse(
                     response,
-                    'template.html',
+                    '../templates/template.html',
                     _extend(qs, {pageElements: pageElements, tags: testSuites[qs.testIndex].tags})
                 );
             })

@@ -1,13 +1,13 @@
 {
-  "name": "test-runner-middleware",
+  "name": "js-test-runner",
   "version": "0.0.0",
-  "description": "FTV test runner",
-  "main": "index.js",
+  "description": "Automates test running",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Joachim Revol-Tissot",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "ejs": "^2.2.4",
     "express": "^4.11.2",
