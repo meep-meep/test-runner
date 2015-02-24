@@ -9,7 +9,13 @@ var queryString = require('queryString');
 
 var _testRenderers = {};
 var currentTestRunnerSessions = {};
-var config = {};
+var config = {
+    'testLibrary': [],
+    'testSuites': [],
+    'reporter-url': '',
+    'before-all': [],
+    'after-all': []
+};
 var ALL_TAGS = '#all#';
 var testSuiteRequest = '/tests';
 
@@ -134,7 +140,7 @@ function matchTags(candidates, reference) {
 }
 
 function filterTestSuites(testsDefinition, tags) {
-    var result = testsDefinition['test-suites']
+    var result = config.tests
         .filter(function(testSuite) {
             for(var testSuiteTags in testSuite) {
                 if(tags === ALL_TAGS || matchTags(tags, formatTags(testSuiteTags))) {
@@ -176,10 +182,17 @@ function addTestRenderers(newTestRenderers) {
     }
 }
 
-function setTestDefinition(newTestDefinition) {
-    config = newTestDefinition;
+function addTests(newTests) {
+    config.tests = config.testLibrary.concat(newTests);
 }
 
+function addTestSuites(newTestDefinition) {
+    config.testSuites = newTestDefinition;
+}
+
+function setConfig(key, value) {
+    config[key] = value;
+}
 
 app.get(
     testSuiteRequest,
@@ -233,10 +246,21 @@ app.get(
     }
 );
 
+function setBeforeAll(beforeAll) {
+    config['before-all'] = beforeAll;
+}
+
+function setAfterAll(afterAll) {
+    config['after-all'] = afterAll;
+}
 
 module.exports = {
     middleware: app,
     addTestRenderers: addTestRenderers,
-    setTestSuites: setTestDefinition
+    addTests: addTests,
+    beforeAll: setBeforeAll,
+    afterAll: setAfterAll,
+    addTestSuites: addTestSuites,
+    set: setConfig
 };
 
