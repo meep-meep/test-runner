@@ -17,7 +17,6 @@ var config = {
     'after-all': []
 };
 var ALL_TAGS = '#all#';
-var testSuiteRequest = '/tests';
 
 
 var app = express();
@@ -139,8 +138,8 @@ function matchTags(candidates, reference) {
     });
 }
 
-function filterTestSuites(testsDefinition, tags) {
-    var result = config.tests
+function filterTests(tests, tags) {
+    var result = tests
         .filter(function(testSuite) {
             for(var testSuiteTags in testSuite) {
                 if(tags === ALL_TAGS || matchTags(tags, formatTags(testSuiteTags))) {
@@ -162,10 +161,6 @@ function filterTestSuites(testsDefinition, tags) {
 }
 
 function fillQueryString(qs) {
-    if(!qs.env) {
-        qs.env = 'prod';
-    }
-
     if(!qs.testRunnerSession) {
         qs.testRunnerSession = +(new Date());
     }
@@ -194,6 +189,9 @@ function setConfig(key, value) {
     config[key] = value;
 }
 
+
+var testSuiteRequest = '/tests';
+
 app.get(
     testSuiteRequest,
     function (request, response, next) {
@@ -202,11 +200,11 @@ app.get(
         if(!tags.length) {
             tags = ALL_TAGS;
         }
-        var testSuites = filterTestSuites(config, tags);
+        var filteredTests = filterTests(config.tests, tags);
 
         fillQueryString(qs);
 
-        if(qs.testIndex >= testSuites.length) {
+        if(qs.testIndex >= filteredTests.length) {
             renderResponse(
                     response,
                     '../templates/done.html',
@@ -221,12 +219,16 @@ app.get(
                 });
             return;
         }
-        getTestSuitePageElements(testSuites[qs.testIndex].elements, qs)
+        getTestSuitePageElements(filteredTests[qs.testIndex].elements, qs)
             .then(function(pageElements) {
                 return renderResponse(
                     response,
                     '../templates/template.html',
-                    _extend(qs, {pageElements: pageElements, tags: testSuites[qs.testIndex].tags})
+                    {
+                        pageElements: pageElements,
+                        tags: filteredTests[qs.testIndex].tags,
+                        qs: qs
+                    }
                 );
             })
             .then(function(renderedView) {

@@ -3,26 +3,6 @@
     <head>
         <title>Test in progress</title>
         <style>
-            .prod {
-                background: #F00;
-            }
-            .preprod {
-                background: #FF0;
-            }
-            .integ {
-                background: #0F0;
-            }
-
-            .prod,
-            .preprod,
-            .integ {
-                position: absolute;
-                top: 12px;
-                right: 55px;
-                width: 10px;
-                height: 10px;
-            }
-
             .title {
                 position: absolute;
                 top: 0;
@@ -43,7 +23,7 @@
     </head>
     <body>
         <script type="text/javascript">
-            var testRunnerSession = '<%= testRunnerSession %>';
+            var testRunnerSession = '<%= qs.testRunnerSession %>';
             function parseQuerystring() {
                 var tmp = location.href
                     .split('?')[1]
@@ -78,7 +58,17 @@
             function report(failures) {
                 document.title = 'Test finished';
                 var img = new Image();
-                img.src = '<%- reporterUrl %>' + '&failures=' + failures + '&tags=<%= tags %>' + '&testLocation=' + encodeURIComponent(location.origin) + '&env=<%= env %>';
+                img.src = [
+                    '<%- qs.reporterUrl %>',
+                    '&failures=' + failures,
+                    '&testLocation=' + encodeURIComponent(location.origin),
+                    '&tags=<%= tags.replace(' ', '') %>',
+                <% Object.keys(qs).forEach(function(qsParam, index) { %>
+                    <% if(['tags', 'testIndex', 'testRunnerSession', 'reporterUrl'].indexOf(qsParam) === -1) { %>
+                        '&<%= qsParam %>=<%= qs[qsParam] %>'<%= (index < Object.keys(qs).length - 1) ? "," : "" %>
+                    <% } %>
+                <% }); %>
+                    ].join('');
             }
 
             function nextTest() {
@@ -89,11 +79,17 @@
         </script>
         
         <div class="title">
-            Tags : <b><%= tags %></b> - environment : <b><%= env %></b>
+            <%-
+            Object.keys(qs)
+                .filter(function(qsParam) {
+                    return ['testIndex', 'testRunnerSession', 'reporterUrl', 'oneShot'].indexOf(qsParam) === -1;
+                })
+                .map(function(qsParam, index) { 
+                    return qsParam + ' : <b>' + qs[qsParam] + '</b>'; 
+                }
+            ).join(' - ');
+            %>
         </div>
-        <div class="<%=env%>">
-        </div>
-            
 
 <% pageElements.forEach(function(line) { %>
         <%- line %>
