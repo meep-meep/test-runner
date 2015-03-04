@@ -7,16 +7,10 @@ var RSVP = require('rsvp');
 var queryString = require('queryString');
 
 
-var _testRenderers = {};
-var currentTestRunnerSessions = {};
-var config = {
-    'testLibrary': [],
-    'testSuites': [],
-    'reporter-url': '',
-    'before-all': [],
-    'after-all': []
-};
 var ALL_TAGS = '#all#';
+
+var _testRenderers = {};
+var _dataAdapter = null;
 
 
 var app = express();
@@ -24,6 +18,10 @@ var app = express();
 app.set('views', path.join(__dirname, '../templates'));
 app.engine('html', ejs.renderFile);
 
+
+function setDataAdapter(dataAdapter) {
+    _dataAdapter = dataAdapter;
+}
 
 function rawContentToTag(rawContent) {
     if(/\.css$/.test(rawContent)) {
@@ -91,16 +89,23 @@ function _extend() {
 }
 
 function getTestSuitePageElements(pageElements, qs) {
-    var preList = config['before-all'];
-    var postList = config['after-all'];
-    var fullElementList = preList.concat(pageElements.slice()).concat(postList);
-    return RSVP.all(
-        fullElementList.map(function(pageElementData) {
-            pageElementData = _formatPageElementData(pageElementData);
-            var params = _extend(pageElementData.params, qs);
-            return getPageElement(pageElementData.name, params);
+    return RSVP.hash({
+            'before-all': _dataAdapter.get('tests/before-all'),
+            'after-all': _dataAdapter.get('tests/after-all')
         })
-    );
+        .then(function(hash) {
+            var preList = hash['before-all'];
+            var postList = hash['after-all'];
+            var fullElementList = preList.concat(pageElements.slice()).concat(postList);
+            return RSVP.all(
+                fullElementList.map(function(pageElementData) {
+                    pageElementData = _formatPageElementData(pageElementData);
+                    var params = _extend(pageElementData.params, qs);
+                    return getPageElement(pageElementData.name, params);
+                })
+            );
+            
+        })
 }
 
 function renderResponse(response, templateName, templateData) {
@@ -138,37 +143,41 @@ function matchTags(candidates, reference) {
     });
 }
 
-function filterTests(tests, tags) {
-    var result = tests
-        .filter(function(testSuite) {
-            for(var testSuiteTags in testSuite) {
-                if(tags === ALL_TAGS || matchTags(tags, formatTags(testSuiteTags))) {
-                    return true;
+function getfilteredTests(tags) {
+    return _dataAdapter.get('tests/library')
+        .then(function(testLibrary) {
+            return testLibrary.filter(function(test) {
+                for(var testTags in test) {
+                    if(tags === ALL_TAGS || matchTags(tags, formatTags(testTags))) {
+                        return true;
+                    }
                 }
-            }
-        })
-        .map(function(testSuite) {
-            var transformedTestSuite;
-            for(var testSuiteTags in testSuite) {
-                transformedTestSuite = {
-                    tags: testSuiteTags,
-                    elements: testSuite[testSuiteTags]
-                };
-            }
-            return transformedTestSuite;
+            })
+            .map(function(test) {
+                var transformedTest;
+                for(var testTags in test) {
+                    transformedTest = {
+                        tags: testTags,
+                        elements: test[testTags]
+                    };
+                }
+                return transformedTest;
+            });
         });
-    return result;
 }
 
 function fillQueryString(qs) {
-    if(!qs.testRunnerSession) {
-        qs.testRunnerSession = +(new Date());
-    }
+    return _dataAdapter.get('reporter-url')
+        .then(function(reporterUrl) {
+            if(!qs.testRunnerSession) {
+                qs.testRunnerSession = +(new Date());
+            }
 
-    if(!qs.testIndex) {
-        qs.testIndex = 0;
-    }
-    qs.reporterUrl = config['reporter-url'] + '?testRunnerSession=' + qs.testRunnerSession + '&testIndex=' + qs.testIndex;
+            if(!qs.testIndex) {
+                qs.testIndex = 0;
+            }
+            qs.reporterUrl = reporterUrl + '?testRunnerSession=' + qs.testRunnerSession + '&testIndex=' + qs.testIndex;
+        });
 }
 
 function addTestRenderers(newTestRenderers) {
@@ -177,18 +186,9 @@ function addTestRenderers(newTestRenderers) {
     }
 }
 
-function addTests(newTests) {
-    config.tests = config.testLibrary.concat(newTests);
-}
-
 function addTestSuites(newTestDefinition) {
     config.testSuites = newTestDefinition;
 }
-
-function setConfig(key, value) {
-    config[key] = value;
-}
-
 
 var testSuiteRequest = '/tests';
 
@@ -200,69 +200,57 @@ app.get(
         if(!tags.length) {
             tags = ALL_TAGS;
         }
-        var filteredTests = filterTests(config.tests, tags);
 
-        fillQueryString(qs);
-
-        if(qs.testIndex >= filteredTests.length) {
-            renderResponse(
-                    response,
-                    '../templates/done.html',
-                    qs
-                )
-                .then(function(renderedView) {
-                    response.send(renderedView);
-                })
-                .catch(function(error) {
-                    console.error(error);
-                    response.res.sendStatus(500);
-                });
-            return;
-        }
-        getTestSuitePageElements(filteredTests[qs.testIndex].elements, qs)
-            .then(function(pageElements) {
-                return renderResponse(
-                    response,
-                    '../templates/template.html',
-                    {
-                        pageElements: pageElements,
-                        tags: filteredTests[qs.testIndex].tags,
-                        qs: qs
-                    }
-                );
+        fillQueryString(qs)
+            .then(function() {
+                return getfilteredTests(tags);
             })
-            .then(function(renderedView) {
-                response.send(renderedView);
+            .then(function(filteredTests) {
+                if(qs.testIndex >= filteredTests.length) {
+                    return renderResponse(
+                            response,
+                            '../templates/done.html',
+                            qs
+                        )
+                        .then(function(renderedView) {
+                            response.send(renderedView);
+                        })
+                        .catch(function(error) {
+                            console.error(error);
+                            response.res.sendStatus(500);
+                        });
+                }
+                else {
+                    return getTestSuitePageElements(filteredTests[qs.testIndex].elements, qs)
+                        .then(function(pageElements) {
+                            return renderResponse(
+                                response,
+                                '../templates/template.html',
+                                {
+                                    pageElements: pageElements,
+                                    tags: filteredTests[qs.testIndex].tags,
+                                    qs: qs
+                                }
+                            );
+                        })
+                        .then(function(renderedView) {
+                            response.send(renderedView);
+                        })
+                        .catch(function(error) {
+                            console.error(error);
+                            response.res.sendStatus(500);
+                        });
+                }
             })
             .catch(function(error) {
                 console.error(error);
-                response.res.sendStatus(500);
-            });
+            })
     }
 );
 
-app.get(
-    '/',
-    function(request, response, next) {
-        response.send('Sorry you need to specify test suite tags in your request as in : <b>' + testSuiteRequest + '</b>');
-    }
-);
-
-function setBeforeAll(beforeAll) {
-    config['before-all'] = beforeAll;
-}
-
-function setAfterAll(afterAll) {
-    config['after-all'] = afterAll;
-}
 
 module.exports = {
+    setDataAdapter: setDataAdapter,
     middleware: app,
-    addTestRenderers: addTestRenderers,
-    addTests: addTests,
-    beforeAll: setBeforeAll,
-    afterAll: setAfterAll,
-    addTestSuites: addTestSuites,
-    set: setConfig
+    addTestRenderers: addTestRenderers
 };
-
