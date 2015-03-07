@@ -1,5 +1,5 @@
 {
-  "name": "js-test-runner",
+  "name": "mm-test-runner",
   "version": "0.0.0",
   "description": "Automates test running",
   "main": "src/index.js",
