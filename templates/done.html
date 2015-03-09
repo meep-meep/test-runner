@@ -5,22 +5,48 @@
 <style>
     body {
         font-family: sans-serif;
+        margin: 0;
+    }
+
+    .meep-meep {
+        color: rgb(253, 253, 198);
+    }
+
+    .title {
+        padding-left: 10px;
+        line-height: 36px;
+        color: white;
+        background: black;
+        font-size: 17px;
+    }
+
+    .section-title {
+        color: #444;
+        background: rgb(230, 219, 219);
+        line-height: 36px;
+        font-size: 14px;
+        margin-top: 20px;
+        padding-left: 10px;
     }
 
     #restart-link {
-        display: block;
-        padding: 10px;
-        width: 140px;
-        margin-top: 10px;
+        display: inline-block;
+        font-size: 14px;
+        padding: 0 12px 0 12px;
+        margin: 10px 0 0 10px;
+        line-height: 36px;
+        border: 0;
 
         background: #5362b9;
         color: white;
         text-decoration: none;
         text-align: center;
+        border-radius: 3px;
     }
 </style>
 
-<p>Tests finished</p>
+<div class="title"><span class="meep-meep">Meep-Meep</span> - <b>Test running session</b></div>
+<p class="section-title">Tests finished</p>
 
 <a id="restart-link" href="/tests">Restart</a>
 
