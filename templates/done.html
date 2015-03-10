@@ -2,53 +2,21 @@
 
 <title>Tests session over</title>
 
+<link rel="stylesheet" type="text/css" href="/styles/base.css"/>
 <style>
-    body {
-        font-family: sans-serif;
-        margin: 0;
-    }
-
-    .meep-meep {
-        color: rgb(253, 253, 198);
-    }
-
-    .title {
-        padding-left: 10px;
-        line-height: 36px;
-        color: white;
-        background: black;
-        font-size: 17px;
-    }
-
-    .section-title {
-        color: #444;
-        background: rgb(230, 219, 219);
-        line-height: 36px;
-        font-size: 14px;
-        margin-top: 20px;
-        padding-left: 10px;
-    }
-
     #restart-link {
         display: inline-block;
-        font-size: 14px;
-        padding: 0 12px 0 12px;
         margin: 10px 0 0 10px;
-        line-height: 36px;
-        border: 0;
-
-        background: #5362b9;
-        color: white;
-        text-decoration: none;
-        text-align: center;
-        border-radius: 3px;
     }
 </style>
 
-<div class="title"><span class="meep-meep">Meep-Meep</span> - <b>Test running session</b></div>
+<div class="title">
+    <span class="meep-meep">Meep-Meep</span>
+    - Test running session
+</div>
 <p class="section-title">Tests finished</p>
 
-<a id="restart-link" href="/tests">Restart</a>
+<a id="restart-link" class="button action" href="/tests">Restart</a>
 
 <script type="text/javascript">
     var querystring = (location.href.split('?')[1]).split('&');
