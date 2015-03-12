@@ -4,7 +4,7 @@ var path = require('path');
 var express = require('express');
 var ejs = require('ejs');
 var RSVP = require('rsvp');
-var queryString = require('queryString');
+var queryString = require('querystring');
 
 
 var ALL_TAGS = '#all#';
