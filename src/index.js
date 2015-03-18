@@ -13,7 +13,7 @@ var _testRenderers = {};
 var _dataAdapter = null;
 
 
-var app = express.Router();
+var app = express();
 
 app.set('views', path.join(__dirname, '../templates'));
 app.engine('html', ejs.renderFile);
