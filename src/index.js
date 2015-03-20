@@ -5,6 +5,7 @@ var express = require('express');
 var ejs = require('ejs');
 var RSVP = require('rsvp');
 var queryString = require('querystring');
+var shallowExtend = require('shallow-extend');
 
 
 var ALL_TAGS = '#all#';
@@ -73,21 +74,6 @@ function _formatPageElementData(pageElementData) {
     return result;
 }
 
-function _extend() {
-    var result = {};
-    var iterator;
-    var currentObject;
-    for(var i = 0 ; i < arguments.length ; i++) {
-        currentObject = arguments[i];
-        for(iterator in currentObject) {
-            if(currentObject.hasOwnProperty(iterator)) {
-                result[iterator] = currentObject[iterator];
-            }
-        }
-    }
-    return result;
-}
-
 function getTestSuitePageElements(pageElements, qs) {
     return RSVP.hash({
             'before-all': _dataAdapter.get('tests/before-all'),
@@ -100,7 +86,7 @@ function getTestSuitePageElements(pageElements, qs) {
             return RSVP.all(
                 fullElementList.map(function(pageElementData) {
                     pageElementData = _formatPageElementData(pageElementData);
-                    var params = _extend(pageElementData.params, qs);
+                    var params = _shallowExtend({}, pageElementData.params, qs);
                     return getPageElement(pageElementData.name, params);
                 })
             );

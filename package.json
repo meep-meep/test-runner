@@ -12,6 +12,7 @@
     "ejs": "^2.2.4",
     "express": "^4.11.2",
     "querystring": "^0.2.0",
-    "rsvp": "^3.0.16"
+    "rsvp": "^3.0.16",
+    "shallow-extend": "0.0.1"
   }
 }
