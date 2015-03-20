@@ -22,3 +22,5 @@ testRunnerSession:
 
 reporterUrl:
     specifies to which url send the test results
+
+It's also possible to add custom query strings that will be made available to test templates
