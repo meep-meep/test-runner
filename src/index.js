@@ -125,7 +125,7 @@ function matchTags(candidates, reference) {
         return true;
     }
     return candidates.every(function(candidate) {
-        return reference.indexOf(candidate) !== -1;
+        return reference.toLowerCase().indexOf(candidate.toLowerCase()) !== -1;
     });
 }
 
