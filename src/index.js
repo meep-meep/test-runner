@@ -86,7 +86,7 @@ function getTestSuitePageElements(pageElements, qs) {
             return RSVP.all(
                 fullElementList.map(function(pageElementData) {
                     pageElementData = _formatPageElementData(pageElementData);
-                    var params = _shallowExtend({}, pageElementData.params, qs);
+                    var params = shallowExtend({}, pageElementData.params, qs);
                     return getPageElement(pageElementData.name, params);
                 })
             );
