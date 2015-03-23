@@ -117,7 +117,7 @@ function formatTags(tagString) {
     }
     return tagString
         .split(',')
-        .map(function(tag) {return tag.trim()});
+        .map(function(tag) {return tag.trim().toLowerCase()});
 }
 
 function matchTags(candidates, reference) {
@@ -125,7 +125,7 @@ function matchTags(candidates, reference) {
         return true;
     }
     return candidates.every(function(candidate) {
-        return reference.toLowerCase().indexOf(candidate.toLowerCase()) !== -1;
+        return reference.indexOf(candidate) !== -1;
     });
 }
 
