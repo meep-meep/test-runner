@@ -48,6 +48,8 @@ function getPageElement(pageElementName, params) {
 
 function _formatPageElementData(pageElementData) {
     var result = {};
+    var elementName;
+    
     if(!pageElementData) {
         return null;
     }
@@ -90,8 +92,7 @@ function getTestSuitePageElements(pageElements, qs) {
                     return getPageElement(pageElementData.name, params);
                 })
             );
-            
-        })
+        });
 }
 
 function renderResponse(response, templateName, templateData) {
@@ -117,7 +118,7 @@ function formatTags(tagString) {
     }
     return tagString
         .split(',')
-        .map(function(tag) {return tag.trim().toLowerCase()});
+        .map(function(tag) {return tag.trim().toLowerCase();});
 }
 
 function matchTags(candidates, reference) {
