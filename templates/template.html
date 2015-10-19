@@ -56,7 +56,7 @@
 
 
             function report(failures) {
-                document.title = 'Test finished';
+                document.title = 'Test finished (' + (failures ? 'failure' : 'success') + ')';
                 var img = new Image();
                 img.src = [
                     '<%- qs.reporterUrl %>',
