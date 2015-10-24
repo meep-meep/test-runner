@@ -1,10 +1,11 @@
 {
   "name": "mm-test-runner",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Automates test running",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --check-leaks -R dot",
+    "cov": "mocha --require blanket -R html-cov > coverage.html"
   },
   "author": "Joachim Revol-Tissot",
   "license": "MIT",
@@ -14,5 +15,12 @@
     "querystring": "^0.2.0",
     "rsvp": "^3.0.16",
     "shallow-extend": "0.0.1"
+  },
+  "devDependencies": {
+    "blanket": "^1.1.7",
+    "expect.js": "^0.3.1",
+    "mocha": "^2.3.3",
+    "mockery": "^1.4.0",
+    "sinon": "^1.17.2"
   }
 }
