@@ -1,7 +1,12 @@
 var express = require('express');
 var ejs = require('ejs');
+var path = require('path');
+var RSVP = require('RSVP');
+
 
 var app = express();
+app.engine('html', ejs.renderFile);
+
 
 var testRunner = require('./test-runner');
 

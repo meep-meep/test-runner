@@ -37,7 +37,7 @@ module.exports = {
                     };
                 }
                 else {
-                    return _getTestSuitePageElements(filteredTests[qs.testIndex].elements, qs)
+                    return this._getTestSuitePageElements(filteredTests[qs.testIndex].elements, qs)
                         .then(function(pageElements) {
                             return {
                                 templateName: 'template.html',
@@ -47,9 +47,9 @@ module.exports = {
                                     qs: qs
                                 }
                             };
-                        });
+                        }.bind(this));
                 }
-            });
+            }.bind(this));
     },
 
     setDataAdapter: function setDataAdapter(dataAdapter) {
@@ -131,7 +131,7 @@ module.exports = {
                     fullElementList.map(function(pageElementData) {
                         pageElementData = this._formatPageElementData(pageElementData);
                         var params = shallowExtend({}, pageElementData.params, qs);
-                        return this_getPageElement(pageElementData.name, params);
+                        return this._getPageElement(pageElementData.name, params);
                     }.bind(this))
                 );
             }.bind(this));
