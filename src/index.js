@@ -1,7 +1,7 @@
 var express = require('express');
 var ejs = require('ejs');
 var path = require('path');
-var RSVP = require('RSVP');
+var RSVP = require('rsvp');
 
 
 var app = express();
